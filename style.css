@@ -26,7 +26,10 @@ body{
 .app{
   width:min(960px,100%);
   margin:0 auto;
-  padding:20px 16px 42px;
+  padding:
+    max(40px, env(safe-area-inset-top))
+    16px
+    42px;
 }
 
 .topbar{
