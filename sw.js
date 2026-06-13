@@ -1,4 +1,4 @@
-const CACHE_NAME = "backtest-lab-supabase-v1";
+const CACHE_NAME = "backtest-lab-supabase-v2";
 const FILES = ["./", "./index.html", "./style.css", "./app.js", "./config.js", "./manifest.json", "./icon.svg"];
 
 self.addEventListener("install", event => {
