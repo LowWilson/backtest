@@ -108,6 +108,34 @@ async function addSymbol(value, sync = true){
   }
 }
 
+
+async function removeSymbol() {
+    const symbol = $("symbol").value;
+
+    if (!symbol) return;
+
+    if (symbols.length <= 1) {
+        alert("最低1つは残してください。");
+        return;
+    }
+
+    if (!confirm(`${symbol} を削除しますか？`)) return;
+
+    symbols = symbols.filter(s => s !== symbol);
+
+    saveSymbolsLocal();
+
+    $("symbol").value = symbols[0];
+
+    if (currentUser && sb) {
+        await sb
+            .from("symbols")
+            .delete()
+            .eq("user_id", currentUser.id)
+            .eq("name", symbol);
+    }
+}
+
 function getChecked(name){ return document.querySelector(`input[name="${name}"]:checked`)?.value; }
 function getSetups(){ return [...document.querySelectorAll(".chips input:checked")].map(x => x.value); }
 
@@ -432,6 +460,7 @@ $("tradeForm").addEventListener("submit", async e => {
 });
 
 $("addSymbolBtn").addEventListener("click", () => addSymbol());
+$("removeSymbolBtn").addEventListener("click", removeSymbol);
 $("syncBtn").addEventListener("click", syncAll);
 $("exportBtn").addEventListener("click", exportCSV);
 $("resetBtn").addEventListener("click", resetForm);
