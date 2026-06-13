@@ -405,7 +405,7 @@ input[type="date"]{
 
 input[type="date"] {
     min-width: 0;
-    width: 95%;
+    width: 90%;
     max-width: 100%;
     box-sizing: border-box;
     -webkit-appearance: none;
