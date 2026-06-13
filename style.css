@@ -403,10 +403,17 @@ input[type="date"]{
     -webkit-appearance:none;
 }
 
-input[type="date"] {
-    min-width: 0;
-    width: 90%;
-    max-width: 100%;
-    box-sizing: border-box;
-    -webkit-appearance: none;
+/* iPhone Safari date input fix */
+input[type="date"]{
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+  box-sizing: border-box;
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+/* grid内のlabelが中身に引っ張られて広がるのを防ぐ */
+.grid > label{
+  min-width: 0;
 }
