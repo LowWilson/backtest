@@ -18,6 +18,9 @@ const isSupabaseReady = () =>
   window.supabase;
 
 function initSupabase(){
+  console.log("URL:", SUPABASE_URL);
+  console.log("KEY:", SUPABASE_ANON_KEY);
+  console.log("Supabase:", window.supabase);
   if(!isSupabaseReady()){
     setStatus("Local mode：config.js にSupabase情報を入れると同期できる");
     return;
