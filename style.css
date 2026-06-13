@@ -117,3 +117,7 @@ input:focus,select:focus,textarea:focus{border-color:rgba(54,231,255,.8);box-sha
   .hero-grid{grid-template-columns:repeat(2,1fr)}
   .result-rr{grid-template-columns:1fr}
 }
+
+.danger {
+    border-color: rgba(255,80,80,.4);
+}
