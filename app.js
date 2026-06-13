@@ -1,6 +1,3 @@
-alert("app.js loaded");
-console.log("app.js loaded");
-
 const $ = (id) => document.getElementById(id);
 
 const STORAGE_KEY = "backtestLabTrades_v1";
@@ -21,11 +18,6 @@ const isSupabaseReady = () =>
   window.supabase;
 
 function initSupabase(){
-
-  console.log("URL:", SUPABASE_URL);
-  console.log("KEY exists:", !!SUPABASE_ANON_KEY);
-  console.log("Supabase:", window.supabase);
-
   console.log(
     typeof SUPABASE_URL !== "undefined",
     typeof SUPABASE_ANON_KEY !== "undefined",
