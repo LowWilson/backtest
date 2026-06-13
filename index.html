@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>Backtest Lab</title>
+  <meta name="theme-color" content="#0F1115" />
+  <link rel="manifest" href="manifest.json" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="app">
+    <header class="topbar">
+      <div>
+        <p class="eyebrow">SMC Backtest Tracker</p>
+        <h1>Backtest Lab</h1>
+      </div>
+      <button id="exportBtn" class="ghost-btn">CSV</button>
+    </header>
+
+    <main>
+      <section class="hero card">
+        <div>
+          <p class="label">Total R</p>
+          <h2 id="totalR">0.00R</h2>
+        </div>
+        <div class="hero-grid">
+          <div>
+            <span id="winRate">0%</span>
+            <small>Win Rate</small>
+          </div>
+          <div>
+            <span id="avgR">0.00R</span>
+            <small>Avg R</small>
+          </div>
+          <div>
+            <span id="maxLossStreak">0L</span>
+            <small>Max Loss</small>
+          </div>
+          <div>
+            <span id="tradeCount">0</span>
+            <small>Trades</small>
+          </div>
+        </div>
+      </section>
+
+      <section class="card form-card">
+        <div class="section-head">
+          <h2>New Backtest</h2>
+          <button id="resetBtn" class="text-btn">Reset</button>
+        </div>
+
+        <form id="tradeForm">
+          <input type="hidden" id="editingId" />
+
+          <div class="grid two">
+            <label>
+              Symbol
+              <input id="symbol" type="text" value="XAUUSD" placeholder="XAUUSD" />
+            </label>
+
+            <label>
+              Backtest Date
+              <input id="date" type="date" />
+            </label>
+          </div>
+
+          <div class="quick-pairs">
+            <button type="button" data-htf="4H" data-ltf="15m">4H → 15m</button>
+            <button type="button" data-htf="1H" data-ltf="5m">1H → 5m</button>
+            <button type="button" data-htf="30m" data-ltf="3m">30m → 3m</button>
+            <button type="button" data-htf="15m" data-ltf="3m">15m → 3m</button>
+            <button type="button" data-htf="15m" data-ltf="1m">15m → 1m</button>
+          </div>
+
+          <div class="grid two">
+            <label>
+              HTF
+              <select id="htf">
+                <option>4H</option>
+                <option>1H</option>
+                <option>30m</option>
+                <option>15m</option>
+              </select>
+            </label>
+
+            <label>
+              LTF
+              <select id="ltf">
+                <option>15m</option>
+                <option>5m</option>
+                <option>3m</option>
+                <option>1m</option>
+              </select>
+            </label>
+          </div>
+
+          <div class="field">
+            <p class="field-title">Direction</p>
+            <div class="segmented">
+              <input id="long" type="radio" name="direction" value="Long" checked />
+              <label for="long">Long</label>
+              <input id="short" type="radio" name="direction" value="Short" />
+              <label for="short">Short</label>
+            </div>
+          </div>
+
+          <div class="field">
+            <p class="field-title">SMC Conditions</p>
+            <div class="chips">
+              <label><input type="checkbox" value="Liquidity Sweep" /> <span>Sweep</span></label>
+              <label><input type="checkbox" value="CHoCH" /> <span>CHoCH</span></label>
+              <label><input type="checkbox" value="BOS" /> <span>BOS</span></label>
+              <label><input type="checkbox" value="FVG" /> <span>FVG</span></label>
+              <label><input type="checkbox" value="OB" /> <span>OB</span></label>
+            </div>
+          </div>
+
+          <div class="field">
+            <p class="field-title">Fib</p>
+            <div class="segmented">
+              <input id="fibYes" type="radio" name="fib" value="0.5以上" checked />
+              <label for="fibYes">0.5以上</label>
+              <input id="fibNo" type="radio" name="fib" value="Fibなし" />
+              <label for="fibNo">Fibなし</label>
+            </div>
+          </div>
+
+          <div class="grid two">
+            <div class="field">
+              <p class="field-title">Result</p>
+              <div class="segmented result">
+                <input id="win" type="radio" name="result" value="Win" checked />
+                <label for="win">Win</label>
+                <input id="loss" type="radio" name="result" value="Loss" />
+                <label for="loss">Loss</label>
+                <input id="be" type="radio" name="result" value="BE" />
+                <label for="be">BE</label>
+              </div>
+            </div>
+
+            <label>
+              RR
+              <input id="rr" type="number" inputmode="decimal" step="0.1" placeholder="2.0 / -1.0 / 0" required />
+            </label>
+          </div>
+
+          <label>
+            Memo
+            <textarea id="memo" rows="4" placeholder="気づいたこと、負けた理由、改善点など"></textarea>
+          </label>
+
+          <button class="primary-btn" type="submit" id="saveBtn">Save Trade</button>
+        </form>
+      </section>
+
+      <section class="card">
+        <div class="section-head">
+          <h2>Analysis</h2>
+          <select id="analysisType">
+            <option value="timeframe">Timeframe</option>
+            <option value="setup">SMC Condition</option>
+            <option value="fib">Fib</option>
+            <option value="direction">Direction</option>
+          </select>
+        </div>
+        <div id="analysisList" class="analysis-list empty">No data yet.</div>
+      </section>
+
+      <section class="card">
+        <div class="section-head">
+          <h2>History</h2>
+          <button id="clearBtn" class="danger-text">Clear All</button>
+        </div>
+        <div id="historyList" class="history-list empty">No trades yet.</div>
+      </section>
+    </main>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
