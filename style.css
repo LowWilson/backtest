@@ -393,3 +393,9 @@ input:focus,select:focus,textarea:focus{
   .hero-grid{grid-template-columns:repeat(2,1fr)}
   .result-rr{grid-template-columns:1fr}
 }
+
+input[type="date"]{
+    min-width:0;
+    width:100%;
+    -webkit-appearance:none;
+}
