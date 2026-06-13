@@ -55,7 +55,12 @@ input:focus,select:focus,textarea:focus{border-color:rgba(54,231,255,.8);box-sha
 .auth-form{display:grid;gap:12px}
 .auth-actions{display:flex;gap:8px;flex-wrap:wrap}
 .user-panel{display:flex;justify-content:space-between;align-items:center;gap:12px;background:#10131A;border:1px solid var(--line);border-radius:16px;padding:12px}
-.symbol-row{display:grid;grid-template-columns:1fr auto;gap:8px;align-items:end}
+.symbol-row{
+  display:grid;
+  grid-template-columns:1fr auto auto;
+  gap:8px;
+  align-items:end;
+}
 .field{margin:14px 0}
 .quick-pairs{display:flex;gap:8px;overflow:auto;padding:4px 0 14px}
 .quick-pairs button,.ghost-btn,.text-btn,.danger-text,.mini-btn{
