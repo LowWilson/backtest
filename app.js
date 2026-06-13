@@ -1,3 +1,6 @@
+alert("app.js loaded");
+console.log("app.js loaded");
+
 const $ = (id) => document.getElementById(id);
 
 const STORAGE_KEY = "backtestLabTrades_v1";
