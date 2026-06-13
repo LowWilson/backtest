@@ -18,14 +18,6 @@ const isSupabaseReady = () =>
   window.supabase;
 
 function initSupabase(){
-  console.log(
-    typeof SUPABASE_URL !== "undefined",
-    typeof SUPABASE_ANON_KEY !== "undefined",
-    !!SUPABASE_URL,
-    !!SUPABASE_ANON_KEY,
-    !!window.supabase
-  );
-
   if(!isSupabaseReady()){
     setStatus("Local mode：config.js にSupabase情報を入れると同期できる");
     return;
@@ -89,20 +81,28 @@ function saveSymbolsLocal(){
 }
 
 function renderSymbols(){
-  $("symbolOptions").innerHTML = symbols.map(s => `<option value="${escapeHtml(s)}"></option>`).join("");
+  $("symbol").innerHTML = symbols
+    .map(s => `<option value="${escapeHtml(s)}">${escapeHtml(s)}</option>`)
+    .join("");
 }
 
 async function addSymbol(value, sync = true){
-  const symbol = String(value || $("symbol").value || "").trim().toUpperCase();
+  const current = $("symbol").value;
+  const symbol = prompt("追加するSymbolを入力", current || "XAUUSD");
+
   if(!symbol) return;
-  symbols.push(symbol);
+
+  const clean = symbol.trim().toUpperCase();
+  if(!clean) return;
+
+  symbols.push(clean);
   saveSymbolsLocal();
-  $("symbol").value = symbol;
+  $("symbol").value = clean;
 
   if(sync && currentUser && sb){
     await sb.from("symbols").upsert({
       user_id: currentUser.id,
-      name: symbol,
+      name: clean,
       updated_at: new Date().toISOString()
     }, { onConflict: "user_id,name" });
   }
@@ -399,7 +399,6 @@ $("tradeForm").addEventListener("submit", async e => {
 
   const now = new Date().toISOString();
   const symbol = $("symbol").value.trim().toUpperCase() || "XAUUSD";
-  await addSymbol(symbol, false);
 
   const id = $("editingId").value || crypto.randomUUID();
   const old = trades.find(t => t.id === id);
