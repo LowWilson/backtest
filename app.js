@@ -1,7 +1,10 @@
 const $ = (id) => document.getElementById(id);
 const STORAGE_KEY = "backtestLabTrades_v1";
+const SYMBOL_KEY = "backtestLabSymbols_v1";
+const DEFAULT_SYMBOLS = ["XAUUSD", "USDJPY", "EURUSD", "GBPUSD", "BTCUSD"];
 
 let trades = JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]");
+let symbols = JSON.parse(localStorage.getItem(SYMBOL_KEY) || "null") || DEFAULT_SYMBOLS;
 
 function todayISO(){
   const d = new Date();
@@ -11,6 +14,24 @@ function todayISO(){
 
 function save(){
   localStorage.setItem(STORAGE_KEY, JSON.stringify(trades));
+}
+
+function saveSymbols(){
+  symbols = [...new Set(symbols.map(s => s.trim().toUpperCase()).filter(Boolean))].sort();
+  localStorage.setItem(SYMBOL_KEY, JSON.stringify(symbols));
+  renderSymbols();
+}
+
+function renderSymbols(){
+  $("symbolOptions").innerHTML = symbols.map(s => `<option value="${escapeHtml(s)}"></option>`).join("");
+}
+
+function addSymbol(value){
+  const symbol = String(value || $("symbol").value || "").trim().toUpperCase();
+  if(!symbol) return;
+  symbols.push(symbol);
+  saveSymbols();
+  $("symbol").value = symbol;
 }
 
 function getChecked(name){
@@ -88,75 +109,87 @@ function renderHistory(){
   box.className = "history-list";
   box.innerHTML = trades.slice().reverse().map(t => {
     const cls = resultClass(t.result);
-    const tags = [...t.setups, t.fib].filter(Boolean);
+    const tags = [...(t.setups || []), t.fib].filter(Boolean);
     return `
       <div class="trade ${cls}">
         <div class="trade-top">
           <div>
             <div class="trade-title ${cls}">${t.result.toUpperCase()} ${formatR(t.rr)}</div>
-            <div class="trade-meta">${t.symbol}・${t.htf}→${t.ltf}・${t.direction}・${t.date || ""}</div>
+            <div class="trade-meta">${escapeHtml(t.symbol)}・${t.htf}→${t.ltf}・${t.direction}・${t.date || ""}</div>
           </div>
           <div class="trade-actions">
             <button class="icon-btn" onclick="editTrade('${t.id}')">Edit</button>
             <button class="icon-btn" onclick="deleteTrade('${t.id}')">Delete</button>
           </div>
         </div>
-        <div class="trade-tags">${tags.map(x => `<span>${x}</span>`).join("")}</div>
+        <div class="trade-tags">${tags.map(x => `<span>${escapeHtml(x)}</span>`).join("")}</div>
         ${t.memo ? `<div class="trade-memo">${escapeHtml(t.memo)}</div>` : ""}
       </div>
     `;
   }).join("");
 }
 
-function groupBy(type){
-  const map = {};
-
-  const add = (key, trade) => {
-    if(!key) return;
-    if(!map[key]) map[key] = [];
-    map[key].push(trade);
-  };
-
-  trades.forEach(t => {
-    if(type === "timeframe") add(`${t.htf} → ${t.ltf}`, t);
-    if(type === "fib") add(t.fib, t);
-    if(type === "direction") add(t.direction, t);
-    if(type === "setup"){
-      if(!t.setups.length) add("No SMC", t);
-      t.setups.forEach(s => add(s, t));
-    }
-  });
-
-  return map;
-}
-
 function renderAnalysis(){
-  const type = $("analysisType").value;
   const box = $("analysisList");
-  const groups = groupBy(type);
-  const rows = Object.entries(groups)
-    .map(([key, list]) => ({ key, ...stats(list) }))
-    .sort((a,b) => b.total - a.total);
 
-  if(!rows.length){
+  if(!trades.length){
     box.className = "analysis-list empty";
     box.textContent = "No data yet.";
     return;
   }
 
+  const individualKeys = ["Liquidity Sweep", "CHoCH", "BOS", "FVG", "OB"];
+
+  const individual = individualKeys
+    .map(key => {
+      const list = trades.filter(t => (t.setups || []).includes(key));
+      return { key: key === "Liquidity Sweep" ? "Sweep" : key, ...stats(list) };
+    })
+    .filter(x => x.total > 0);
+
+  const comboMap = {};
+  trades.forEach(t => {
+    const setups = (t.setups || []).slice().sort();
+    if(setups.length < 2) return;
+    const key = setups.map(x => x === "Liquidity Sweep" ? "Sweep" : x).join(" + ");
+    if(!comboMap[key]) comboMap[key] = [];
+    comboMap[key].push(t);
+  });
+
+  const combos = Object.entries(comboMap)
+    .map(([key, list]) => ({ key, ...stats(list) }))
+    .sort((a,b) => b.winRate - a.winRate || b.total - a.total)
+    .slice(0, 8);
+
+  if(!individual.length && !combos.length){
+    box.className = "analysis-list empty";
+    box.textContent = "SMC条件が入った記録がまだない。";
+    return;
+  }
+
   box.className = "analysis-list";
-  box.innerHTML = rows.map(r => `
+  box.innerHTML = `
+    ${individual.length ? `<h3 class="analysis-section-title">Individual</h3>` : ""}
+    ${individual.map(analysisRow).join("")}
+    ${combos.length ? `<h3 class="analysis-section-title">Top Combinations</h3>` : ""}
+    ${combos.map(analysisRow).join("")}
+  `;
+}
+
+function analysisRow(r){
+  return `
     <div class="analysis-row">
       <div class="analysis-row-top">
-        <strong>${r.key}</strong>
-        <span>${r.winRate.toFixed(0)}% / ${formatR(r.totalR)} / ${r.total} trades</span>
+        <strong>${escapeHtml(r.key)}</strong>
+        <span>${r.winRate.toFixed(0)}% / ${r.avgR.toFixed(2)}R avg / ${r.total}</span>
       </div>
       <div class="bar"><span style="width:${Math.min(r.winRate,100)}%"></span></div>
     </div>
-  `).join("");
+  `;
 }
 
 function render(){
+  renderSymbols();
   renderDashboard();
   renderHistory();
   renderAnalysis();
@@ -166,7 +199,7 @@ function resetForm(){
   $("tradeForm").reset();
   $("editingId").value = "";
   $("date").value = todayISO();
-  $("symbol").value = "XAUUSD";
+  $("symbol").value = symbols.includes("XAUUSD") ? "XAUUSD" : (symbols[0] || "");
   $("saveBtn").textContent = "Save Trade";
   document.querySelectorAll(".quick-pairs button").forEach(b => b.classList.remove("active"));
 }
@@ -233,10 +266,13 @@ function exportCSV(){
 $("tradeForm").addEventListener("submit", e => {
   e.preventDefault();
 
+  const symbol = $("symbol").value.trim().toUpperCase() || "XAUUSD";
+  addSymbol(symbol);
+
   const id = $("editingId").value || crypto.randomUUID();
   const trade = {
     id,
-    symbol: $("symbol").value.trim() || "XAUUSD",
+    symbol,
     date: $("date").value,
     htf: $("htf").value,
     ltf: $("ltf").value,
@@ -257,6 +293,8 @@ $("tradeForm").addEventListener("submit", e => {
   render();
 });
 
+$("addSymbolBtn").addEventListener("click", () => addSymbol());
+
 document.querySelectorAll(".quick-pairs button").forEach(btn => {
   btn.addEventListener("click", () => {
     $("htf").value = btn.dataset.htf;
@@ -267,7 +305,6 @@ document.querySelectorAll(".quick-pairs button").forEach(btn => {
 });
 
 $("resetBtn").addEventListener("click", resetForm);
-$("analysisType").addEventListener("change", renderAnalysis);
 $("exportBtn").addEventListener("click", exportCSV);
 
 $("clearBtn").addEventListener("click", () => {

@@ -136,6 +136,15 @@ input:focus,select:focus,textarea:focus{
   box-shadow:0 0 0 3px rgba(54,231,255,.10);
 }
 
+.symbol-row{
+  display:grid;
+  grid-template-columns:1fr auto;
+  gap:8px;
+  align-items:end;
+}
+
+.symbol-row input{margin-top:8px}
+
 .field{margin:14px 0}
 
 .quick-pairs{
@@ -148,13 +157,22 @@ input:focus,select:focus,textarea:focus{
 .quick-pairs button,
 .ghost-btn,
 .text-btn,
-.danger-text{
+.danger-text,
+.mini-btn{
   border:1px solid var(--line);
   background:#10131A;
   color:var(--text);
   border-radius:999px;
   padding:10px 12px;
   white-space:nowrap;
+}
+
+.mini-btn{
+  height:48px;
+  margin-top:8px;
+  font-weight:800;
+  color:var(--accent);
+  border-color:rgba(54,231,255,.35);
 }
 
 .quick-pairs button.active{
@@ -227,6 +245,17 @@ input:focus,select:focus,textarea:focus{
   color:var(--accent);
   background:rgba(54,231,255,.08);
 }
+
+.result-rr{
+  display:grid;
+  grid-template-columns:1.45fr .75fr;
+  gap:12px;
+  align-items:end;
+  margin:14px 0;
+}
+
+.result-field{margin:0}
+.rr-field input{height:51px}
 
 .primary-btn{
   width:100%;
@@ -313,6 +342,12 @@ input:focus,select:focus,textarea:focus{
   padding:4px;
 }
 
+.analysis-section-title{
+  color:var(--text);
+  font-size:14px;
+  margin:6px 0 2px;
+}
+
 .analysis-row{
   background:#10131A;
   border:1px solid var(--line);
@@ -324,7 +359,14 @@ input:focus,select:focus,textarea:focus{
   display:flex;
   justify-content:space-between;
   align-items:center;
+  gap:12px;
   margin-bottom:9px;
+}
+
+.analysis-row-top span{
+  color:var(--muted);
+  font-size:13px;
+  white-space:nowrap;
 }
 
 .bar{
@@ -346,7 +388,8 @@ input:focus,select:focus,textarea:focus{
   .hero{grid-template-columns:.8fr 1.2fr;align-items:center}
 }
 
-@media (max-width:520px){
+@media (max-width:560px){
   .grid.two{grid-template-columns:1fr}
   .hero-grid{grid-template-columns:repeat(2,1fr)}
+  .result-rr{grid-template-columns:1fr}
 }
