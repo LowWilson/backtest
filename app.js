@@ -301,7 +301,7 @@ function resetForm(){
     htf: lastSettings.htf || $("htf").value,
     ltf: lastSettings.ltf || $("ltf").value,
     direction: lastSettings.direction || getChecked("direction") || "Long",
-    fib: lastSettings.fib || getChecked("fib") || "0.5以上"
+    fib: lastSettings.fib || getChecked("fib") || "Fib 0.618"
   };
 
   $("editingId").value = "";
