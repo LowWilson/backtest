@@ -277,18 +277,36 @@ function render(){
 }
 
 function resetForm(){
-  const currentSymbol = $("symbol").value;
-  const currentHtf = $("htf").value;
-  const currentLtf = $("ltf").value;
+  const current = {
+    symbol: $("symbol").value,
+    htf: $("htf").value,
+    ltf: $("ltf").value,
+    direction: getChecked("direction"),
+    fib: getChecked("fib")
+  };
 
-  $("tradeForm").reset();
-
+  // 編集状態解除
   $("editingId").value = "";
+
+  // 維持
+  $("symbol").value = current.symbol;
+  $("htf").value = current.htf;
+  $("ltf").value = current.ltf;
+
+  setRadio("direction", current.direction);
+  setRadio("fib", current.fib);
+
+  // リセット
   $("date").value = todayISO();
 
-  $("symbol").value = currentSymbol || (symbols.includes("XAUUSD") ? "XAUUSD" : (symbols[0] || ""));
-  $("htf").value = currentHtf || "4H";
-  $("ltf").value = currentLtf || "15m";
+  document.querySelectorAll(".chips input").forEach(cb => {
+    cb.checked = false;
+  });
+
+  $("rr").value = "";
+  $("memo").value = "";
+
+  setRadio("result", "Win");
 
   $("saveBtn").textContent = "Save Trade";
 
