@@ -89,9 +89,26 @@ function saveSymbolsLocal(){
 }
 
 function renderSymbols(){
+  const currentSymbol = $("symbol").value;
+  const currentAnalysisSymbol = $("analysisSymbol").value || "ALL";
+
   $("symbol").innerHTML = symbols
     .map(s => `<option value="${escapeHtml(s)}">${escapeHtml(s)}</option>`)
     .join("");
+
+  $("analysisSymbol").innerHTML =
+    `<option value="ALL">All Symbols</option>` +
+    symbols
+      .map(s => `<option value="${escapeHtml(s)}">${escapeHtml(s)}</option>`)
+      .join("");
+
+  if(symbols.includes(currentSymbol)){
+    $("symbol").value = currentSymbol;
+  }
+
+  if(currentAnalysisSymbol === "ALL" || symbols.includes(currentAnalysisSymbol)){
+    $("analysisSymbol").value = currentAnalysisSymbol;
+  }
 }
 
 async function addSymbol(value, sync = true){
@@ -253,17 +270,24 @@ function renderAnalysis(){
     return;
   }
 
+  const selectedSymbol = $("analysisSymbol").value;
+
+  const filteredTrades =
+    selectedSymbol === "ALL"
+      ? trades
+      : trades.filter(t => t.symbol === selectedSymbol);
+
   const individualKeys = ["Liquidity Sweep", "CHoCH", "BOS", "FVG", "OB", "Confluence Filter"];
 
   const individual = individualKeys
     .map(key => {
-      const list = trades.filter(t => (t.setups || []).includes(key));
+      const list = filteredTrades.filter(t => (t.setups || []).includes(key));
       return { key: key === "Liquidity Sweep" ? "Sweep" : key, ...stats(list) };
     })
     .filter(x => x.total > 0);
 
   const comboMap = {};
-  trades.forEach(t => {
+  filteredTrades.forEach(t => {
     const setups = (t.setups || []).slice().sort();
     if(setups.length < 2) return;
 
@@ -281,7 +305,7 @@ function renderAnalysis(){
     .slice(0, 8);
 
   const timeframeMap = {};
-  trades.forEach(t => {
+  filteredTrades.forEach(t => {
     const key = `${t.htf} → ${t.ltf}`;
     if(!timeframeMap[key]) timeframeMap[key] = [];
     timeframeMap[key].push(t);
@@ -569,6 +593,7 @@ $("ltf").addEventListener("change", rememberSettings);
 document.querySelectorAll('input[name="direction"], input[name="fib"]').forEach(el => {
   el.addEventListener("change", rememberSettings);
 });
+$("analysisSymbol").addEventListener("change", renderAnalysis);
 
 $("loginBtn").addEventListener("click", async () => {
   if(!sb) return alert("config.js にSupabase情報を入れてね。");
