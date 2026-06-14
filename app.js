@@ -277,12 +277,29 @@ function render(){
 }
 
 function resetForm(){
+  const currentSymbol = $("symbol").value;
+  const currentHtf = $("htf").value;
+  const currentLtf = $("ltf").value;
+
   $("tradeForm").reset();
+
   $("editingId").value = "";
   $("date").value = todayISO();
-  $("symbol").value = symbols.includes("XAUUSD") ? "XAUUSD" : (symbols[0] || "");
+
+  $("symbol").value = currentSymbol || (symbols.includes("XAUUSD") ? "XAUUSD" : (symbols[0] || ""));
+  $("htf").value = currentHtf || "4H";
+  $("ltf").value = currentLtf || "15m";
+
   $("saveBtn").textContent = "Save Trade";
-  document.querySelectorAll(".quick-pairs button").forEach(b => b.classList.remove("active"));
+
+  updateQuickPairActive();
+}
+
+function updateQuickPairActive(){
+  document.querySelectorAll(".quick-pairs button").forEach(btn => {
+    const active = btn.dataset.htf === $("htf").value && btn.dataset.ltf === $("ltf").value;
+    btn.classList.toggle("active", active);
+  });
 }
 
 function editTrade(id){
@@ -505,8 +522,7 @@ document.querySelectorAll(".quick-pairs button").forEach(btn => {
   btn.addEventListener("click", () => {
     $("htf").value = btn.dataset.htf;
     $("ltf").value = btn.dataset.ltf;
-    document.querySelectorAll(".quick-pairs button").forEach(b => b.classList.remove("active"));
-    btn.classList.add("active");
+    updateQuickPairActive();
   });
 });
 
