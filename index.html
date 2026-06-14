@@ -77,20 +77,19 @@
           <div class="grid">
             <label>
               Symbol
-            <div class="symbol-row">
+              <div class="symbol-row">
                 <select id="symbol"></select>
-            
+          
                 <button id="addSymbolBtn" class="mini-btn" type="button">
-                    Add
+                  Add
                 </button>
-            
-                <button id="removeSymbolBtn"
-                        class="mini-btn danger"
-                        type="button">
-                    Remove
+          
+                <button id="removeSymbolBtn" class="mini-btn danger" type="button">
+                  Remove
                 </button>
-            </div>
-
+              </div>
+            </label>
+          
             <label>
               Backtest Date
               <input id="date" type="date" />
@@ -183,7 +182,17 @@
       </section>
 
       <section class="card">
-        <div class="section-head"><h2>SMC Analysis</h2></div>
+        <div class="section-head">
+          <h2>SMC Analysis</h2>
+        </div>
+      
+        <label>
+          Symbol Filter
+          <select id="analysisSymbol">
+            <option value="ALL">All Symbols</option>
+          </select>
+        </label>
+      
         <div id="analysisList" class="analysis-list empty">No data yet.</div>
       </section>
 
