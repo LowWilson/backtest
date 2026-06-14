@@ -84,6 +84,18 @@ input:focus,select:focus,textarea:focus{border-color:rgba(54,231,255,.8);box-sha
   color:var(--muted); font-weight:700;
 }
 .segmented input:checked+label{background:var(--card2);color:var(--text);border:1px solid var(--line)}
+/* Direction */
+#long:checked + label{
+  background:rgba(34,197,94,.18);
+  color:var(--green);
+  border:1px solid rgba(34,197,94,.35);
+}
+
+#short:checked + label{
+  background:rgba(239,68,68,.18);
+  color:var(--red);
+  border:1px solid rgba(239,68,68,.35);
+}
 .chips{display:flex;flex-wrap:wrap;gap:8px}
 .chips label{margin:0}
 .chips input{display:none}
@@ -123,6 +135,25 @@ input:focus,select:focus,textarea:focus{border-color:rgba(54,231,255,.8);box-sha
   .result-rr{grid-template-columns:1fr}
 }
 
-.danger {
-    border-color: rgba(255,80,80,.4);
+.danger{
+  color:var(--red);
+  border-color:rgba(255,80,80,.4);
+}
+
+#win:checked + label{
+  background:rgba(34,197,94,.18);
+  color:var(--green);
+  border:1px solid rgba(34,197,94,.35);
+}
+
+#loss:checked + label{
+  background:rgba(239,68,68,.18);
+  color:var(--red);
+  border:1px solid rgba(239,68,68,.35);
+}
+
+#be:checked + label{
+  background:rgba(245,158,11,.18);
+  color:var(--yellow);
+  border:1px solid rgba(245,158,11,.35);
 }
