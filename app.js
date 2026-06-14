@@ -254,6 +254,7 @@ function renderAnalysis(){
   }
 
   const individualKeys = ["Liquidity Sweep", "CHoCH", "BOS", "FVG", "OB", "Confluence Filter"];
+
   const individual = individualKeys
     .map(key => {
       const list = trades.filter(t => (t.setups || []).includes(key));
@@ -265,7 +266,11 @@ function renderAnalysis(){
   trades.forEach(t => {
     const setups = (t.setups || []).slice().sort();
     if(setups.length < 2) return;
-    const key = setups.map(x => x === "Liquidity Sweep" ? "Sweep" : x).join(" + ");
+
+    const key = setups
+      .map(x => x === "Liquidity Sweep" ? "Sweep" : x)
+      .join(" + ");
+
     if(!comboMap[key]) comboMap[key] = [];
     comboMap[key].push(t);
   });
@@ -275,9 +280,20 @@ function renderAnalysis(){
     .sort((a,b) => b.winRate - a.winRate || b.total - a.total)
     .slice(0, 8);
 
-  if(!individual.length && !combos.length){
+  const timeframeMap = {};
+  trades.forEach(t => {
+    const key = `${t.htf} → ${t.ltf}`;
+    if(!timeframeMap[key]) timeframeMap[key] = [];
+    timeframeMap[key].push(t);
+  });
+
+  const timeframes = Object.entries(timeframeMap)
+    .map(([key, list]) => ({ key, ...stats(list) }))
+    .sort((a,b) => b.total - a.total);
+
+  if(!individual.length && !combos.length && !timeframes.length){
     box.className = "analysis-list empty";
-    box.textContent = "SMC条件が入った記録がまだない。";
+    box.textContent = "No data yet.";
     return;
   }
 
@@ -285,8 +301,12 @@ function renderAnalysis(){
   box.innerHTML = `
     ${individual.length ? `<h3 class="analysis-section-title">Individual</h3>` : ""}
     ${individual.map(analysisRow).join("")}
+
     ${combos.length ? `<h3 class="analysis-section-title">Top Combinations</h3>` : ""}
     ${combos.map(analysisRow).join("")}
+
+    ${timeframes.length ? `<h3 class="analysis-section-title">Timeframe Pairs</h3>` : ""}
+    ${timeframes.map(analysisRow).join("")}
   `;
 }
 
