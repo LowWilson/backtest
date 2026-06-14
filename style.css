@@ -157,3 +157,12 @@ input:focus,select:focus,textarea:focus{border-color:rgba(54,231,255,.8);box-sha
   color:var(--yellow);
   border:1px solid rgba(245,158,11,.35);
 }
+.direction.long{
+    color: var(--green);
+    font-weight: 700;
+}
+
+.direction.short{
+    color: var(--red);
+    font-weight: 700;
+}
