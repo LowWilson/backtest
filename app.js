@@ -311,9 +311,23 @@ function renderAnalysis(){
     timeframeMap[key].push(t);
   });
 
+  const timeframeOrder = [
+    "15m → 1m",
+    "15m → 3m",
+    "30m → 3m",
+    "1H → 5m",
+    "4H → 15m"
+  ];
+  
   const timeframes = Object.entries(timeframeMap)
     .map(([key, list]) => ({ key, ...stats(list) }))
-    .sort((a,b) => b.total - a.total);
+    .sort((a, b) => {
+      const aIndex = timeframeOrder.indexOf(a.key);
+      const bIndex = timeframeOrder.indexOf(b.key);
+  
+      return (aIndex === -1 ? 999 : aIndex) -
+             (bIndex === -1 ? 999 : bIndex);
+    });
 
   if(!individual.length && !combos.length && !timeframes.length){
     box.className = "analysis-list empty";
