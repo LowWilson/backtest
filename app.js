@@ -9,6 +9,13 @@ let symbols = JSON.parse(localStorage.getItem(SYMBOL_KEY) || "null") || DEFAULT_
 let currentUser = null;
 let sb = null;
 let syncing = false;
+let lastSettings = {
+  symbol: "",
+  htf: "",
+  ltf: "",
+  direction: "",
+  fib: ""
+};
 
 const isSupabaseReady = () =>
   typeof SUPABASE_URL !== "undefined" &&
@@ -98,6 +105,7 @@ async function addSymbol(value, sync = true){
   symbols.push(clean);
   saveSymbolsLocal();
   $("symbol").value = clean;
+  rememberSettings();
 
   if(sync && currentUser && sb){
     await sb.from("symbols").upsert({
@@ -126,7 +134,8 @@ async function removeSymbol() {
     saveSymbolsLocal();
 
     $("symbol").value = symbols[0];
-
+    rememberSettings();
+  
     if (currentUser && sb) {
         await sb
             .from("symbols")
@@ -276,19 +285,27 @@ function render(){
   renderAnalysis();
 }
 
-function resetForm(){
-  const current = {
+function rememberSettings(){
+  lastSettings = {
     symbol: $("symbol").value,
     htf: $("htf").value,
     ltf: $("ltf").value,
     direction: getChecked("direction"),
     fib: getChecked("fib")
   };
+}
 
-  // 編集状態解除
+function resetForm(){
+  const current = {
+    symbol: lastSettings.symbol || $("symbol").value,
+    htf: lastSettings.htf || $("htf").value,
+    ltf: lastSettings.ltf || $("ltf").value,
+    direction: lastSettings.direction || getChecked("direction") || "Long",
+    fib: lastSettings.fib || getChecked("fib") || "0.5以上"
+  };
+
   $("editingId").value = "";
 
-  // 維持
   $("symbol").value = current.symbol;
   $("htf").value = current.htf;
   $("ltf").value = current.ltf;
@@ -296,7 +313,6 @@ function resetForm(){
   setRadio("direction", current.direction);
   setRadio("fib", current.fib);
 
-  // リセット
   $("date").value = todayISO();
 
   document.querySelectorAll(".chips input").forEach(cb => {
@@ -463,6 +479,7 @@ $("tradeForm").addEventListener("submit", async e => {
 
   const now = new Date().toISOString();
   const symbol = $("symbol").value.trim().toUpperCase() || "XAUUSD";
+  rememberSettings();
 
   const id = $("editingId").value || crypto.randomUUID();
   const old = trades.find(t => t.id === id);
@@ -501,6 +518,12 @@ $("removeSymbolBtn").addEventListener("click", removeSymbol);
 $("syncBtn").addEventListener("click", syncAll);
 $("exportBtn").addEventListener("click", exportCSV);
 $("resetBtn").addEventListener("click", resetForm);
+$("symbol").addEventListener("change", rememberSettings);
+$("htf").addEventListener("change", rememberSettings);
+$("ltf").addEventListener("change", rememberSettings);
+document.querySelectorAll('input[name="direction"], input[name="fib"]').forEach(el => {
+  el.addEventListener("change", rememberSettings);
+});
 
 $("loginBtn").addEventListener("click", async () => {
   if(!sb) return alert("config.js にSupabase情報を入れてね。");
@@ -542,6 +565,7 @@ document.querySelectorAll(".quick-pairs button").forEach(btn => {
   btn.addEventListener("click", () => {
     $("htf").value = btn.dataset.htf;
     $("ltf").value = btn.dataset.ltf;
+    rememberSettings();
     updateQuickPairActive();
   });
 });
@@ -554,4 +578,5 @@ if("serviceWorker" in navigator){
 
 initSupabase();
 render();
+rememberSettings();
 resetForm();
