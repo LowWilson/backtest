@@ -16,6 +16,7 @@ let lastSettings = {
   direction: "",
   fib: ""
 };
+let visibleTrades = 10;
 
 const isSupabaseReady = () =>
   typeof SUPABASE_URL !== "undefined" &&
@@ -198,7 +199,13 @@ function renderHistory(){
   }
 
   box.className = "history-list";
-  box.innerHTML = trades.slice().sort((a,b) => String(b.createdAt || "").localeCompare(String(a.createdAt || ""))).map(t => {
+  const sortedTrades = trades.slice()
+    .sort((a,b) => String(b.createdAt || "").localeCompare(String(a.createdAt || "")));
+  
+  box.innerHTML =
+    sortedTrades
+      .slice(0, visibleTrades)
+      .map(t => {
     const cls = resultClass(t.result);
     const tags = [...(t.setups || []), t.fib].filter(Boolean);
     return `
@@ -226,7 +233,15 @@ function renderHistory(){
         ${t.memo ? `<div class="trade-memo">${escapeHtml(t.memo)}</div>` : ""}
       </div>
     `;
-  }).join("");
+    }).join("") +
+
+    (sortedTrades.length > visibleTrades
+      ? `
+        <button id="loadMoreBtn" class="ghost-btn">
+          More (${sortedTrades.length - visibleTrades})
+        </button>
+      `
+      : "");
 }
 
 function renderAnalysis(){
@@ -510,6 +525,7 @@ $("tradeForm").addEventListener("submit", async e => {
   };
 
   trades = old ? trades.map(t => t.id === id ? trade : t) : [...trades, trade];
+  visibleTrades = 10;
   saveLocal();
   render();
   resetForm();
@@ -561,12 +577,24 @@ $("clearBtn").addEventListener("click", async () => {
 
   const ids = trades.map(t => t.id);
   trades = [];
+  visibleTrades = 10;
   saveLocal();
   render();
 
   if(currentUser && sb && ids.length){
     const { error } = await sb.from("trades").delete().in("id", ids).eq("user_id", currentUser.id);
     if(error) alert("Supabase側の全削除に失敗: " + error.message);
+  }
+});
+
+document.addEventListener("click", e => {
+  if (e.target.id === "loadMoreBtn") {
+    visibleTrades = Math.min(
+      visibleTrades + 10,
+      trades.length
+    );
+
+    renderHistory();
   }
 });
 
@@ -585,7 +613,7 @@ if("serviceWorker" in navigator){
   });
 }
 
-initSupabase();
 render();
 rememberSettings();
 resetForm();
+initSupabase();
