@@ -484,8 +484,9 @@ $("tradeForm").addEventListener("submit", async e => {
 
   trades = old ? trades.map(t => t.id === id ? trade : t) : [...trades, trade];
   saveLocal();
-  resetForm();
   render();
+  resetForm();
+  
 
   if(currentUser && sb){
     const { error } = await sb.from("trades").upsert(toDbTrade(trade), { onConflict: "id" });
