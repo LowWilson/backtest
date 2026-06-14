@@ -433,6 +433,7 @@ async function syncAll(){
 
     setStatus(`Synced：${trades.length} trades`);
     render();
+    resetForm();
   }catch(err){
     console.error(err);
     setStatus("Sync failed");
@@ -552,5 +553,5 @@ if("serviceWorker" in navigator){
 }
 
 initSupabase();
-resetForm();
 render();
+resetForm();
