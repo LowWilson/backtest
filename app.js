@@ -205,9 +205,18 @@ function renderHistory(){
       <div class="trade ${cls}">
         <div class="trade-top">
           <div>
-            <div class="trade-title ${cls}">${t.result.toUpperCase()} ${formatR(t.rr)}</div>
-            <div class="trade-meta">${escapeHtml(t.symbol)}・${t.htf}→${t.ltf}・${t.direction}・${t.date || ""}</div>
+            <div class="trade-title ${cls}">
+              ${t.result.toUpperCase()} ${formatR(t.rr)}
+            </div>
+        
+            <div class="trade-meta">
+              ${escapeHtml(t.symbol)}
+              ・${t.htf}→${t.ltf}
+              ・<span class="direction ${t.direction.toLowerCase()}">${t.direction}</span>
+              ・${t.date || ""}
+            </div>
           </div>
+        
           <div class="trade-actions">
             <button class="icon-btn" onclick="editTrade('${t.id}')">Edit</button>
             <button class="icon-btn" onclick="deleteTrade('${t.id}')">Delete</button>
