@@ -277,7 +277,7 @@ function renderAnalysis(){
       ? trades
       : trades.filter(t => t.symbol === selectedSymbol);
 
-  const individualKeys = ["Liquidity Sweep", "CHoCH", "BOS", "FVG", "OB", "Confluence Filter"];
+  const individualKeys = ["Liquidity Sweep", "CHoCH", "BOS", "FVG", "OB"];
 
   const individual = individualKeys
     .map(key => {
