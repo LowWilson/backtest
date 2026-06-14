@@ -2,7 +2,7 @@ const $ = (id) => document.getElementById(id);
 
 const STORAGE_KEY = "backtestLabTrades_v1";
 const SYMBOL_KEY = "backtestLabSymbols_v1";
-const DEFAULT_SYMBOLS = ["XAUUSD", "USDJPY", "EURUSD", "GBPUSD", "BTCUSD"];
+const DEFAULT_SYMBOLS = ["XAUUSD", "US100", "EURUSD", "BTCUSD", "US30"];
 
 let trades = JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]");
 let symbols = JSON.parse(localStorage.getItem(SYMBOL_KEY) || "null") || DEFAULT_SYMBOLS;
@@ -220,7 +220,7 @@ function renderAnalysis(){
     return;
   }
 
-  const individualKeys = ["Liquidity Sweep", "CHoCH", "BOS", "FVG", "OB"];
+  const individualKeys = ["Liquidity Sweep", "CHoCH", "BOS", "FVG", "OB", "Confluence Filter"];
   const individual = individualKeys
     .map(key => {
       const list = trades.filter(t => (t.setups || []).includes(key));
